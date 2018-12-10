@@ -1,12 +1,17 @@
+const gitUtil = require('./git-util');
+
 class Blob {
   async getBlob() {
+    const hash = await gitUtil.getHash(content);
+    const blob = await gitUtil.compress(content);
+
     return {
       type: 'BLOB',
       mode: '100644',
-      hash: '', // should get sha-1
-      blob: '',
-      size: '',
-      name: '',
+      hash,
+      blob,
+      size: content.length,
+      name: filepath,
     };
   }
 
