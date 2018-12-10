@@ -1,6 +1,6 @@
-const blob = require('./blob');
-const tree = require('./tree');
-const commit = require('./commit');
+const blob = require('./lib/blob');
+const tree = require('./lib/tree');
+const commit = require('./lib/commit');
 
 module.exports = {
   blob,

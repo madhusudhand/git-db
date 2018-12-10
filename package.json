@@ -5,5 +5,8 @@
   "repository": "git@github.com:madhusudhand/git-db.git",
   "author": "madhusudhand <madhusudhan.dollu@gmail.com>",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "dependencies": {
+    "util.promisify": "^1.0.0"
+  }
 }
