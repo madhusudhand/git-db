@@ -2,8 +2,9 @@ const gitUtil = require('./git-util');
 const gitTree = require('./tree');
 
 class Commit {
-  async getCommit(objects, parent, author, committer, comment) {
-    const tree = await gitTree.getTree(objects);
+
+  async get(objects, parent, author, committer, comment) {
+    const tree = await gitTree.get(objects);
     const author_timestamp = Date.now();
     const committer_timestamp = author_timestamp;
 
@@ -33,11 +34,11 @@ class Commit {
     };
   }
 
-  async writeCommit() {
+  async write() {
     // write commit to db
   }
 
-  async readCommit() {
+  async read() {
     // read commit from db
   }
 }
