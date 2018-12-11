@@ -1,4 +1,5 @@
 const gitUtil = require('./git-util');
+const gitConfig = require('./git-config');
 
 class Blob {
   async get() {
@@ -15,12 +16,17 @@ class Blob {
     };
   }
 
-  async read() {
-    // read the object from db
+  async write(blob) {
+    const b = await gitConfig.config.readBlob({ hash: blob.hash });
+    if (!b) {
+      await gitConfig.config.writeBlob({ blob });
+    }
   }
 
-  async write() {
-    // write the object to db
+  async read(hash) {
+    const blob = await gitConfig.config.readBlob({ hash }); // returns compressed content
+    blob.blob = await gitUtil.uncompress(blob.blob_content);
+    return blob;
   }
 }
 
