@@ -1,5 +1,6 @@
 const gitUtil = require('./git-util');
 const gitBlob = require('./blob');
+const gitConfig = require('./git-config');
 
 class Tree {
   async get() {
@@ -25,8 +26,30 @@ class Tree {
     // write tree to db
   }
 
-  async read() {
-    // read tree from db
+  async read(hash) {
+    const tree = await gitConfig.config.readTree({ hash });
+    if (!tree) {
+      return null;
+    }
+
+    tree.objects = [];
+    const objects = await gitConfig.config.readTreeObjects({ tree });
+
+    if (Array.isArray(objects)) {
+      for (const obj of objects) {
+        const blob = await gitBlob.read({ hash: obj.hash });
+        tree.objects.push({
+          hash: obj.hash,
+          name: obj.name,
+          content: blob.blob,
+          type: obj.type,
+          mode: obj.mode,
+          meta: obj.meta,
+        });
+      }
+    }
+
+    return tree;
   }
 }
 

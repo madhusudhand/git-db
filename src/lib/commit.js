@@ -38,8 +38,28 @@ class Commit {
     // write commit to db
   }
 
-  async read() {
-    // read commit from db
+  async read(hash) {
+    // read the commit at given hash
+    const commit = await gitConfig.config.readCommit({ hash });
+
+    if (!commit) {
+      return null;
+    }
+
+    // read corresponding commit tree
+    const tree = await gitTree.read({ hash: commit.tree_hash });
+
+    return {
+      hash: commit.commit_hash,
+      author: commit.author,
+      author_timestamp: commit.author_timestamp,
+      committer: commit.committer,
+      committer_timestamp: commit.committer_timestamp,
+      commit_message: commit.commit_message || '',
+      tree,
+      parent1: commit.parent1 || null,
+      parent2: commit.parent2 || null,
+    };
   }
 }
 
