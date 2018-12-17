@@ -1,6 +1,7 @@
 const blob = require('./lib/blob');
 const tree = require('./lib/tree');
 const commit = require('./lib/commit');
+const branch = require('./lib/branch');
 const gitConfig = require('./lib/git-config');
 
 module.exports = {
@@ -10,4 +11,5 @@ module.exports = {
   blob,
   tree,
   commit,
+  branch,
 };
