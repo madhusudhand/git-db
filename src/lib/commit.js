@@ -38,16 +38,16 @@ class Commit {
     // write commit to db
   }
 
-  async read(hash) {
+  async read({ repo, hash }) {
     // read the commit at given hash
-    const commit = await gitConfig.config.readCommit({ hash });
+    const commit = await gitConfig.config.readCommit({ repo, hash });
 
     if (!commit) {
       return null;
     }
 
     // read corresponding commit tree
-    const tree = await gitTree.read({ hash: commit.tree_hash });
+    const tree = await gitTree.read({ repo, hash: commit.tree_hash });
 
     return {
       hash: commit.commit_hash,
