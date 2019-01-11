@@ -26,18 +26,18 @@ class Tree {
     // write tree to db
   }
 
-  async read({ repo, hash }) {
-    const tree = await gitConfig.config.readTree({ repo, hash });
+  async read({ transaction, repo, hash }) {
+    const tree = await gitConfig.config.readTree({ transaction, repo, hash });
     if (!tree) {
       return null;
     }
 
     tree.objects = [];
-    const objects = await gitConfig.config.readTreeObjects({ repo, tree });
+    const objects = await gitConfig.config.readTreeObjects({ transaction, repo, tree });
 
     if (Array.isArray(objects)) {
       for (const obj of objects) {
-        const blob = await gitBlob.read({ repo, hash: obj.hash });
+        const blob = await gitBlob.read({ transaction, repo, hash: obj.hash });
         tree.objects.push({
           hash: obj.hash,
           name: obj.name,

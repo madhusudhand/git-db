@@ -38,28 +38,37 @@ class Commit {
     // write commit to db
   }
 
-  async read({ repo, hash }) {
-    // read the commit at given hash
-    const commit = await gitConfig.config.readCommit({ repo, hash });
+  async read(repo, head) {
+    const transaction = await gitConfig.config.beginTransaction();
 
-    if (!commit) {
+    try {
+      // read the commit at given hash
+      const commit = await gitConfig.config.readCommit({ transaction, repo, hash: head });
+
+      if (!commit) {
+        return null;
+      }
+
+      // read corresponding commit tree
+      const tree = await gitTree.read({ transaction, repo, hash: commit.tree_hash });
+      await gitConfig.config.commitTransaction({ transaction });
+
+      return {
+        hash: commit.commit_hash,
+        author: commit.author,
+        author_timestamp: commit.author_timestamp,
+        committer: commit.committer,
+        committer_timestamp: commit.committer_timestamp,
+        commit_message: commit.commit_message || '',
+        tree,
+        parent1: commit.parent1 || null,
+        parent2: commit.parent2 || null,
+        meta: commit.meta || null,
+      };
+    } catch (e) {
+      await gitConfig.config.rollbackTransaction({ transaction });
       return null;
     }
-
-    // read corresponding commit tree
-    const tree = await gitTree.read({ repo, hash: commit.tree_hash });
-
-    return {
-      hash: commit.commit_hash,
-      author: commit.author,
-      author_timestamp: commit.author_timestamp,
-      committer: commit.committer,
-      committer_timestamp: commit.committer_timestamp,
-      commit_message: commit.commit_message || '',
-      tree,
-      parent1: commit.parent1 || null,
-      parent2: commit.parent2 || null,
-    };
   }
 }
 

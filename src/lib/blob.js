@@ -16,15 +16,15 @@ class Blob {
     };
   }
 
-  async write({ repo, blob }) {
-    const b = await gitConfig.config.readBlob({ repo, hash: blob.hash });
+  async write({ transaction, repo, blob }) {
+    const b = await gitConfig.config.readBlob({ transaction, repo, hash: blob.hash });
     if (!b) {
-      await gitConfig.config.writeBlob({ repo, blob });
+      await gitConfig.config.writeBlob({ transaction, repo, blob });
     }
   }
 
-  async read({ repo, hash }) {
-    const blob = await gitConfig.config.readBlob({ repo, hash });
+  async read({ transaction, repo, hash }) {
+    const blob = await gitConfig.config.readBlob({ transaction, repo, hash });
     blob.blob = await gitUtil.uncompress(blob.blob_content);
     return blob;
   }
