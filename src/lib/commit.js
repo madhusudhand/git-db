@@ -38,10 +38,30 @@ class Commit {
     // write commit to db
   }
 
-  async read(repo, head) {
+  async read(repo, branch) {
     const transaction = await gitConfig.config.beginTransaction();
 
     try {
+      let head;
+      // check if the hash is a branch name
+      if (branch) {
+        const branches = await gitConfig.config.readBranches({ transaction, repo });
+        const index = branches.findIndex(b => b.branch === branch);
+        if (index > -1) {
+          head = branches[index].head;
+        }
+      }
+
+      // if branch not found, get the head of default branch
+      if (!head) {
+        head = await gitConfig.config.readHead({ transaction, repo, branch: 'master' });
+      }
+
+      // if master isn't found, return
+      if (!head) {
+        return null;
+      }
+
       // read the commit at given hash
       const commit = await gitConfig.config.readCommit({ transaction, repo, hash: head });
 
