@@ -18,12 +18,37 @@ class Tree {
     const tree_str = tree.objects.map(d => `${d.mode} ${d.type.toLowerCase()} ${d.hash} ${d.name}`).join('\n');
 
     tree.hash = await gitUtil.getHash(tree_str);
-  
     return tree;
   }
 
-  async write() {
-    // write tree to db
+  async write({ transaction, repo, tree }) {
+    const objects = [];
+    for (const obj of tree.objects) {
+      if (obj.type === 'BLOB') {
+        await gitBlob.write({ transaction, repo, blob: obj });
+      }
+      objects.push({
+        mode: obj.mode,
+        type: obj.type,
+        hash: obj.hash,
+        name: obj.name,
+        meta: obj.meta,
+      });
+    }
+
+    await this._write(transaction, repo, {
+      hash: tree.hash,
+      objects,
+    });
+  }
+
+  async _write(transaction, repo, tree) {
+    const t = await gitConfig.config.readTree({ transaction, repo, hash: tree.hash });
+    if (!t) {
+      const tree_id = await gitConfig.config.writeTree({ transaction, repo, tree });
+      tree.meta = { id: tree_id };
+      await gitConfig.config.writeTreeObjects({ transaction, repo, tree });
+    }
   }
 
   async read({ transaction, repo, hash }) {
