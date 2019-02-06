@@ -3,6 +3,10 @@ const gitTree = require('./tree');
 const gitConfig = require('./git-config');
 
 class Commit {
+  async getFileDiff(repo, head) {
+    const base_commit = this.read(repo, head);
+  }
+
   async get(objects, {
     parent, author, committer, comment,
   }) {
